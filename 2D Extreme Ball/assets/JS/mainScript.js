@@ -46,8 +46,8 @@ let setupPlayers = () => {
     const numPlayers = 2;
 
     const controlSchemes = [
-        ['w', 'a', 's', 'd'],
-        ['ArrowUp', 'ArrowLeft', 'ArrowDown', 'ArrowRight'],    
+        ['w', 'a', 's', 'd', 'e'],
+        ['ArrowUp', 'ArrowLeft', 'ArrowDown', 'ArrowRight', 'Insert'],    
     ]
 
     for(let i = 0; i < numPlayers; i++) {
@@ -56,10 +56,17 @@ let setupPlayers = () => {
             size: 20,
             coreColor: playerColors[i], 
             outlineColor: 'rgba(0, 0, 0, 1)',
+            deflectionColor: 'rgba(0, 255, 255, 0.9)',
+
             movementSpeed: 10,
-            controScheme: controlSchemes[i] 
+            controScheme: controlSchemes[i],
+
+            deflectionCooldown: 2000,
+            deflectionDuration: 200,
+            timeOfLastDeflection: 0,
+            deflectionActive: false                       
         })
-    }
+    } 
 }
 
 let draw = () => {
@@ -82,6 +89,8 @@ let draw = () => {
         ctx.beginPath();
         ctx.arc(player.position.X, player.position.Y, player.size, degToRad(0), degToRad(360), false);
         ctx.fill();
+
+        if(player.deflectionActive) playerDrawDeflection(player);        
     });
 
     //Draw canvas outline
@@ -92,11 +101,12 @@ let draw = () => {
     ctx.lineTo(0, height);
     ctx.lineTo(0, 0);
     ctx.strokeStyle = 'black';
+    ctx.lineWidth = 5;
     ctx.stroke();
 
 }
 
-let movePlayers = () => {
+let managePlayers = () => {
     players.forEach(player => {
         currentKeys.forEach(key => {
             switch (key) {
@@ -112,10 +122,40 @@ let movePlayers = () => {
                 case player.controScheme[3]: //Right movement
                     player.position.X += player.movementSpeed;
                     break;
+                case player.controScheme[4]: //Deflection
+                    playerDeflection(player);
+                    break;
             }
              
-        });
+        });   
+        
+         //Check if players deflection is no longer active
+        if(new Date() - player.timeOfLastDeflection > player.deflectionDuration)
+        {
+            console.log('deflection off');
+            player.deflectionActive = false;
+        }
     })
+}
+
+let playerDeflection = (player) => {
+    
+    if(new Date() - player.timeOfLastDeflection > player.deflectionCooldown) //Check if deflection is off cooldown
+    {
+        player.timeOfLastDeflection = new Date();
+        player.deflectionActive = true;
+    }
+    
+}
+
+let playerDrawDeflection = (player) => {
+
+    ctx.strokeStyle = player.deflectionColor;
+    ctx.lineWidth = 5;
+
+    ctx.beginPath();
+    ctx.arc(player.position.X, player.position.Y, player.size + 10, degToRad(0), degToRad(360), false);
+    ctx.stroke();
 }
 
 
@@ -130,8 +170,10 @@ let setup = () => {
 //Game loop
 let gameLoop = () => {
 
+    //console.log(currentKeys);
+
     validateCanvasSize();
-    movePlayers();
+    managePlayers();
     draw();
     requestAnimationFrame(gameLoop);
 }
