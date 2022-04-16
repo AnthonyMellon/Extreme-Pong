@@ -3,6 +3,8 @@ let height;
 let ctx;
 let players;
 
+let canvasOffset = 10;
+
 let setupCanvas = () => {
     const canvas = document.getElementById('game');
 
@@ -13,6 +15,22 @@ let setupCanvas = () => {
     canvas.height = height;
 
     ctx = canvas.getContext('2d');
+}
+
+//Ensure the canvas is the same size as the window
+let validateCanvasSize = () => {
+    let needsUpdate = false;
+
+    if(width != window.innerWidth) {
+        width = window.innerWidth;
+        needsUpdate = true;
+    }
+    if(height != window.innerHeight) {
+        height = window.innerHeight;
+        needsUpdate = true;
+    }
+
+    if(needsUpdate) setupCanvas();
 }
 
 let setupPlayers = () => {
@@ -65,6 +83,17 @@ let draw = () => {
         ctx.arc(player.position.X, player.position.Y, player.size, degToRad(0), degToRad(360), false);
         ctx.fill();
     });
+
+    //Draw canvas outline
+    ctx.beginPath();
+    ctx.moveTo(0, 0);
+    ctx.lineTo(width, 0);
+    ctx.lineTo(width, height);
+    ctx.lineTo(0, height);
+    ctx.lineTo(0, 0);
+    ctx.strokeStyle = 'black';
+    ctx.stroke();
+
 }
 
 let movePlayers = () => {
@@ -101,6 +130,7 @@ let setup = () => {
 //Game loop
 let gameLoop = () => {
 
+    validateCanvasSize();
     movePlayers();
     draw();
     requestAnimationFrame(gameLoop);

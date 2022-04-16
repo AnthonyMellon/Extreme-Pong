@@ -1,10 +1,4 @@
-:root {
-    --playerSize: 50px;
-}
-
-.player{
-    width: var(--playerSize);
-    height: var(--playerSize);
-    border-radius: var(--playerSize);
-    background-color: red;
+body {
+    margin: 0;
+    overflow: hidden;
 }
