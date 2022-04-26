@@ -2,6 +2,7 @@ let width;
 let height;
 let ctx;
 let players;
+let myBall;
 
 let canvasOffset = 10;
 
@@ -51,22 +52,31 @@ let setupPlayers = () => {
     ]
 
     for(let i = 0; i < numPlayers; i++) {
-        players.push({
-            position: {X: 50 + 50*i, Y: 50 + 50*i},
-            size: 20,
-            coreColor: playerColors[i], 
-            outlineColor: 'rgba(0, 0, 0, 1)',
-            deflectionColor: 'rgba(0, 255, 255, 0.9)',
-
-            movementSpeed: 10,
-            controScheme: controlSchemes[i],
-
-            deflectionCooldown: 2000,
-            deflectionDuration: 200,
-            timeOfLastDeflection: 0,
-            deflectionActive: false                       
-        })
+        players.push(
+            new player(
+                {X: 50 + 50*i, Y: 50 + 50*i}, //Position
+                20, //Size
+                playerColors[i], //core color
+                'rgba(0, 0, 0, 1)', //outline color
+                'rgba(0, 255, 255, 0.9)', //deflection color
+                10, //movement speed
+                controlSchemes[i], //control scheme
+                2000, //deflection cooldown
+                200 //deflection duration
+            )
+        )
     } 
+}
+
+let setupBall = () => {
+    myBall = new ball(
+        {X: 100, Y: 50}, //Position
+        15, //Size
+        'rgba(255, 255, 0, 1)', //Core color
+        'rgba(0, 0, 0 , 1', //Outline color
+        7.5 //movement speed
+    )
+    myBall.getNewTarget(players);
 }
 
 let draw = () => {
@@ -77,21 +87,11 @@ let draw = () => {
 
     //Draw players
     players.forEach(player => {
-
-        //Player outline
-        ctx.fillStyle = player.outlineColor;
-        ctx.beginPath();
-        ctx.arc(player.position.X, player.position.Y, player.size+2, degToRad(0), degToRad(360), false);
-        ctx.fill();
-
-        //Player core
-        ctx.fillStyle = player.coreColor;
-        ctx.beginPath();
-        ctx.arc(player.position.X, player.position.Y, player.size, degToRad(0), degToRad(360), false);
-        ctx.fill();
-
-        if(player.deflectionActive) playerDrawDeflection(player);        
+        player.drawPlayer(ctx);     
     });
+
+    //Draw the ball
+    myBall.drawBall(ctx);
 
     //Draw canvas outline
     ctx.beginPath();
@@ -108,61 +108,21 @@ let draw = () => {
 
 let managePlayers = () => {
     players.forEach(player => {
-        currentKeys.forEach(key => {
-            switch (key) {
-                case player.controScheme[0]: //Up movement
-                    player.position.Y -= player.movementSpeed;
-                    break;
-                case player.controScheme[1]: //Left movement
-                    player.position.X -= player.movementSpeed;
-                    break;
-                case player.controScheme[2]: //Down movement
-                    player.position.Y += player.movementSpeed;
-                    break;
-                case player.controScheme[3]: //Right movement
-                    player.position.X += player.movementSpeed;
-                    break;
-                case player.controScheme[4]: //Deflection
-                    playerDeflection(player);
-                    break;
-            }
-             
-        });   
-        
-         //Check if players deflection is no longer active
-        if(new Date() - player.timeOfLastDeflection > player.deflectionDuration)
-        {
-            console.log('deflection off');
-            player.deflectionActive = false;
-        }
+        player.movePlayer(currentKeys);
+        player.manageDeflection(currentKeys);
     })
 }
 
-let playerDeflection = (player) => {
-    
-    if(new Date() - player.timeOfLastDeflection > player.deflectionCooldown) //Check if deflection is off cooldown
-    {
-        player.timeOfLastDeflection = new Date();
-        player.deflectionActive = true;
-    }
-    
+let manageBall = () => {
+    myBall.getTargetPosition();
+    myBall.moveBall();
 }
-
-let playerDrawDeflection = (player) => {
-
-    ctx.strokeStyle = player.deflectionColor;
-    ctx.lineWidth = 5;
-
-    ctx.beginPath();
-    ctx.arc(player.position.X, player.position.Y, player.size + 10, degToRad(0), degToRad(360), false);
-    ctx.stroke();
-}
-
 
 let setup = () => {
 
     setupCanvas();
     setupPlayers();
+    setupBall();
 
     gameLoop();
 }
@@ -174,6 +134,7 @@ let gameLoop = () => {
 
     validateCanvasSize();
     managePlayers();
+    manageBall();
     draw();
     requestAnimationFrame(gameLoop);
 }
