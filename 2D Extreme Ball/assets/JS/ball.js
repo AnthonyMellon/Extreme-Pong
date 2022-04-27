@@ -2,6 +2,7 @@ class ball {
 
     #targetPlayer;
     #targetPosition;
+    #direction = 0;
 
     constructor(position, size, coreColor, outlineColor, movementSpeed) {
         this.position = position;
@@ -21,23 +22,27 @@ class ball {
         this.#targetPosition = this.#targetPlayer.position;
     }
 
+    //Used to get the balls speed along the x/y axis
+    getVelocity() {
+        //Get the X distance to the target
+        const distX = this.#targetPosition.X - this.position.X;
+
+        //Get the y distance to the target
+        const distY = this.#targetPosition.Y - this.position.Y;
+
+        //Convert xy distance to polar vector
+        let distPol = recToPol(distX, distY);
+
+        //convert polar vector back to x/y and return
+        return(polToRect(this.movementSpeed, distPol.theta));
+
+    }
+
     //Used to move towards the position of the current target
     moveBall() {
-        //Move along X axis
-        if(this.position.X > this.#targetPosition.X) {
-            this.position.X -= this.movementSpeed;
-        }
-        else if (this.position.X < this.#targetPosition.X) {
-            this.position.X += this.movementSpeed;
-        }
-
-        //Move along Y axis        
-        if(this.position.Y > this.#targetPosition.Y) {
-            this.position.Y -= this.movementSpeed;
-        }
-        else if(this.position.Y < this.#targetPosition.Y) {
-            this.position.Y += this.movementSpeed;
-        }
+        const velocity = this.getVelocity();
+        this.position.X += velocity.x;
+        this.position.Y += velocity.y;
     }
 
     //Used to draw the ball to the canvas
