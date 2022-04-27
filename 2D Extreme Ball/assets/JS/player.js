@@ -92,7 +92,8 @@ class player {
         //Draw player core
         ctx.fillStyle = this.coreColor;
         ctx.beginPath();
-        ctx.arc(this.position.X, this.position.Y, this.size, degToRad(0), degToRad(360), false);
+        ctx.arc(this.position.X, this.position.Y, this.size, degToRad(this.#rotation+30), degToRad(this.#rotation-30), false);
+        ctx.lineTo(this.position.X, this.position.Y);
         ctx.fill();
 
         //Draw deflection if its active
