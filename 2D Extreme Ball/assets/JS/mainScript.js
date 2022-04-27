@@ -77,7 +77,7 @@ let setupBall = () => {
         'rgba(0, 0, 0 , 1', //Outline color
         7.5 //movement speed
     )
-    myBall.getNewTarget(players);
+    myBall.setNewTarget(players[0]);
 }
 
 let draw = () => {
@@ -111,13 +111,29 @@ let managePlayers = () => {
     players.forEach(player => {
         player.rotatePlayer(currentKeys);
         player.movePlayer(currentKeys);
-        player.manageDeflection(currentKeys);
+
+        //If a player is attemping to deflect the ball
+        if(player.manageDeflection(currentKeys)) {
+            deflectBall(player);
+        }
     })
 }
 
 let manageBall = () => {
     myBall.getTargetPosition();
     myBall.moveBall();
+}
+
+let deflectBall = (player) => {
+    playerPos = player.getPosition();
+    ballPos = myBall.getPosition();
+
+    if(circleCollision({X: playerPos.X, Y: playerPos.Y, r: player.getSize()}, {X: ballPos.X, Y: ballPos.Y, r: myBall.getSize()})) {
+        let target = players[getRandomInt(0, players.length)];
+        myBall.setNewTarget(target);
+    }
+    
+    
 }
 
 let setup = () => {

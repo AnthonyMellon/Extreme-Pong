@@ -13,8 +13,8 @@ class ball {
     }
 
     //Used to get a new target
-    getNewTarget(players) {
-        this.#targetPlayer = players[getRandomInt(0, players.length)];
+    setNewTarget(player) {
+        this.#targetPlayer = player;
     }
 
     //Used to get the position of the current target
@@ -57,5 +57,15 @@ class ball {
         ctx.beginPath();
         ctx.arc(this.position.X, this.position.Y, this.size, degToRad(0), degToRad(360), false);
         ctx.fill();
+    }
+
+    //Returns the balls position
+    getPosition() {
+        return this.position;
+    }
+
+    //Returns the balls size
+    getSize() {
+        return this.size;
     }
 }

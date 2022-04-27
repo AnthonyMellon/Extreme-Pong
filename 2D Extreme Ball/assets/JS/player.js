@@ -71,6 +71,8 @@ class player {
         if(this.#deflectionActive && new Date() - this.#timeOfLastDeflection > this.deflectionDuration) {
             this.#deflectionActive = false;
         }
+
+        return this.#deflectionActive;
     }
 
     //Activate the deflection
@@ -106,5 +108,15 @@ class player {
             ctx.arc(this.position.X, this.position.Y, this.size + 10, degToRad(0), degToRad(360), false);
             ctx.stroke();
         }   
+    }
+
+    //Returns the players position
+    getPosition() {
+        return this.position;
+    }
+
+    //Returns the players size
+    getSize() {
+        return this.size;
     }
 }

@@ -53,3 +53,15 @@ let recToPol = (x, y) => {
     const theta = radToDeg(Math.atan2(y, x));
     return {r, theta};
 }
+
+/**
+ * 
+ * @param {} c1 an object containing information on the first cirlce {X, Y, r}
+ * @param {} c2 an object containing information on the first cirlce {X, Y, r}
+ * @returns true if the circles collide, false if they do not
+ */
+let circleCollision = (c1, c2) => {
+    const distBetweenCenters = Math.sqrt(Math.pow(c1.X - c2.X, 2) + Math.pow(c1.Y - c2.Y, 2));
+    if(distBetweenCenters > (c1.r + c2.r)) return false;
+    return true;
+}
