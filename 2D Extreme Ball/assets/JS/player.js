@@ -2,8 +2,9 @@ class player {
     
     #timeOfLastDeflection = 0;
     #deflectionActive = false;
+    #rotation = 0;
     
-    constructor(position, size, coreColor, outlineColor, deflectionColor, movementSpeed, controlScheme, deflectionCooldown, deflectionDuration) {                    
+    constructor(position, size, coreColor, outlineColor, deflectionColor, movementSpeed, controlScheme, deflectionCooldown, deflectionDuration, rotationSpeed) {                    
         this.position = position;
         this.size = size;
         this.coreColor = coreColor;
@@ -13,26 +14,47 @@ class player {
         this.controlScheme = controlScheme;
         this.deflectionCooldown = deflectionCooldown;
         this.deflectionDuration = deflectionDuration;
+        this.rotationSpeed = rotationSpeed;
+    }
+
+    //Used to rotate the player
+    rotatePlayer(currentKeys) {
+        currentKeys.forEach(key => {
+            switch (key) {
+                case this.controlScheme[1]: //Left rotation
+                this.#rotation -= this.rotationSpeed;
+                this.#rotation = this.#rotation%360;
+                break;
+                case this.controlScheme[3]: //Right rotation
+                this.#rotation += this.rotationSpeed;
+                this.#rotation = this.#rotation%360;
+                break;
+            }            
+        })
     }
 
     //Used to move the player
     movePlayer(currentKeys) {
+        //Check if the player should move foward or backwards
+        let step = 0;
         currentKeys.forEach(key => {
             switch (key) {
-                case this.controlScheme[0]: //Up movement
-                    this.position.Y -= this.movementSpeed;
+                case this.controlScheme[0]: //Foward movement
+                    step = this.movementSpeed;
                     break;
-                case this.controlScheme[1]: //Left movement
-                    this.position.X -= this.movementSpeed;
-                    break;
-                case this.controlScheme[2]: //Down movement
-                    this.position.Y += this.movementSpeed;
-                    break;
-                case this.controlScheme[3]: //Right movement
-                    this.position.X += this.movementSpeed;
+                case this.controlScheme[2]: //Back movement
+                    step = this.movementSpeed*-1
                     break;
             }
         })
+
+        //Convert step & rotation to rectangular vector
+        const velocity = polToRect(step, this.#rotation);
+
+        //Move according to rectangular vector
+        this.position.X += velocity.x;
+        this.position.Y += velocity.y;
+
     }
 
     //Check if the players deflection should be activated / deactivated

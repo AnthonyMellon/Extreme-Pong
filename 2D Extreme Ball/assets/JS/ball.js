@@ -35,7 +35,6 @@ class ball {
 
         //convert polar vector back to x/y and return
         return(polToRect(this.movementSpeed, distPol.theta));
-
     }
 
     //Used to move towards the position of the current target

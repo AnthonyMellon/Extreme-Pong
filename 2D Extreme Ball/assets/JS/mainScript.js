@@ -62,7 +62,8 @@ let setupPlayers = () => {
                 10, //movement speed
                 controlSchemes[i], //control scheme
                 2000, //deflection cooldown
-                200 //deflection duration
+                200, //deflection duration
+                5 //rotation speed
             )
         )
     } 
@@ -108,6 +109,7 @@ let draw = () => {
 
 let managePlayers = () => {
     players.forEach(player => {
+        player.rotatePlayer(currentKeys);
         player.movePlayer(currentKeys);
         player.manageDeflection(currentKeys);
     })
